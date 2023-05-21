@@ -1,4 +1,5 @@
 from zoitendeik_lib.Zoitendeik import *
+from Wolf import Wolf
 
 if __name__ == '__main__':
     phi0 = Target_function(lambda x: (x[0] - 8) ** 2 + (x[1] + 2) ** 2,
@@ -24,4 +25,15 @@ if __name__ == '__main__':
 
     # K, R изменены в Zoitendeik.py
 
+    print('ZOITENDEIK\n')
     z.minimize(eps=0.01)
+
+    print('\nWOLF\n')
+    A2 = [[-0.5, -1, 1, 0],
+          [-1.5, -1, 0, 1]]
+    b2 = [-2, -3]
+    f2 = Target_function(lambda x: (x[0] - 8) ** 2 + (x[1] + 2) ** 2,
+                         lambda x: [2 * (x[0] - 8), 2 * (x[1] + 2), 0, 0])
+    w2 = Wolf(f2, A2, b2)
+    w2.minimize()
+

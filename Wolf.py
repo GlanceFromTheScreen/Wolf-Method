@@ -106,17 +106,19 @@ class Wolf:
             self.d_upd()
             self.lmd_upd(eps)
             print('N', i)
-            print('I', self.I)
-            print('x', self.x)
-            print('f', self.f0.f(self.x))
-            print('r', self.r)
-            print('d', self.d)
-            print()
+            self.print_params()
             self.x_upd()
 
             if all([abs(self.d[i]) < eps for i in range(self.n)]):
                 print('STOP: d = 0')
                 break
+
+    def print_params(self):
+        print('I', self.I)
+        print('x', [round(self.x[i], 5) for i in range(self.n)])
+        print('f', round(self.f0.f(self.x), 5))
+        print('d', [round(self.d[i], 5) for i in range(self.n)])
+        print()
 
 
 if __name__ == '__main__':
