@@ -217,6 +217,7 @@ class Zoitendeik_step:
         self.x = self.find_x0()
         # self.x = [6.0, 4.0]
         self.print_params()
+        x_array = [self.x]
         i = 0
         while True:  # поставить нормальное условие
             print('N:', i)
@@ -228,11 +229,13 @@ class Zoitendeik_step:
             self.print_params()
             self.x_upd()
 
+            x_array.append(self.x)
+
             if self.eta == 0 and self.dlt < eps and self.dlt < -1 * max([self.phi_list[j].phi(self.x) for j in self.Id]):
                 print('THE END by ETA = 0')
                 break
 
-            if -self.eta < eps and self.dlt < eps:  # если решение - внутри области
+            if -self.eta < eps*0.1 and self.dlt < eps**0.1:  # если решение - внутри области
                 print('THE END by POINT INSIDE SUSPECT')
                 break
 
@@ -241,7 +244,7 @@ class Zoitendeik_step:
                 print('THE END by i')
                 break
 
-        return self.f0.f(self.x)
+        return x_array
 
     def print_params(self):
         print('x', [round(x_, 5) for x_ in self.x])

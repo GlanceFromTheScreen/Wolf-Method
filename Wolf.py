@@ -31,10 +31,12 @@ class Wolf:
             square_matrix = np.matrix(self.A)[:, list(item)]
             try:
                 ans = np.linalg.solve(square_matrix, self.b)
-                for ind in item:
-                    x0[ind] = ans[ind]
-                break
-            except:
+                if all([ans[j] >= 0 for j in range(len(ans))]):
+                    for i in range(len(item)):
+                        x0[item[i]] = ans[i]
+                    break
+            except Exception as ex:
+                print(ex)
                 pass
         self.x = x0
 
@@ -90,16 +92,19 @@ class Wolf:
         lmd_max_list = [-self.x[i] / self.d[i] for i in range(self.n) if self.d[i] < 0]
         if len(lmd_max_list) != 0:
             lmd_max = min(lmd_max_list)
-            pr = One_D_Problem(0, lmd_max, lambda t: self.f0.f([self.x[i] + t * self.d[i] for i in range(self.n)]))
-            self.lmd = pr.golden_search(eps)[0]
         else:
-            self.lmd = 100  # большое число
+            lmd_max = 100  # большое число
+
+        pr = One_D_Problem(0, lmd_max, lambda t: self.f0.f([self.x[i] + t * self.d[i] for i in range(self.n)]))
+        self.lmd = pr.golden_search(eps)[0]
+
 
     def x_upd(self):
         self.x = [self.x[i] + self.lmd * self.d[i] for i in range(self.n)]
 
     def minimize(self, eps=0.01):
         self.find_x0()
+        x_array = [self.x]
         for i in range(30):
             self.I_upd()
             self.r_upd()
@@ -109,15 +114,20 @@ class Wolf:
             self.print_params()
             self.x_upd()
 
+            x_array.append(self.x)
+
             if all([abs(self.d[i]) < eps for i in range(self.n)]):
                 print('STOP: d = 0')
                 break
+
+        return x_array
 
     def print_params(self):
         print('I', self.I)
         print('x', [round(self.x[i], 5) for i in range(self.n)])
         print('f', round(self.f0.f(self.x), 5))
         print('d', [round(self.d[i], 5) for i in range(self.n)])
+        print('lmd', self.lmd)
         print()
 
 
@@ -131,11 +141,12 @@ if __name__ == '__main__':
     # w1 = Wolf(f1, A1, b1)
     # w1.minimize()
 
-    A2 = [[-0.5, -1, 1, 0],
-          [-1.5, -1, 0, 1]]
-    b2 = [-2, -3]
+    A2 = [[-0.5, -1, 1, 0, 0],
+          [-1.5, -1, 0, 1, 0],
+          [1, -1, 0, 0, 1]]
+    b2 = [-2, -3, 4]
     f2 = Target_function(lambda x: (x[0] - 8)**2 + (x[1] + 2)**2,
-                         lambda x: [2*(x[0] - 8), 2*(x[1] + 2), 0, 0])
+                         lambda x: [2*(x[0] - 8), 2*(x[1] + 2), 0, 0, 0])
     w2 = Wolf(f2, A2, b2)
     w2.minimize()
 
